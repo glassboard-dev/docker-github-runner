@@ -1,4 +1,4 @@
-ARG FROM=debian:buster-slim
+ARG FROM=ubuntu:18.04
 FROM ${FROM}
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -42,34 +42,36 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
         zlib1g-dev \
         gettext \
         liblttng-ust0 \
-        libcurl4-openssl-dev && \
+        libcurl4-openssl-dev \
+        git && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chmod 644 /etc/supervisor/conf.d/supervisord.conf
 
-# Install Docker CLI
-RUN curl -fsSL https://get.docker.com -o- | sh && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+# For Glassboard, don't install the CLI and Compose
+# # Install Docker CLI
+# RUN curl -fsSL https://get.docker.com -o- | sh && \
+#     rm -rf /var/lib/apt/lists/* && \
+#     apt-get clean
 
-# Install Docker-Compose
-RUN curl -L -o /usr/local/bin/docker-compose \
-    "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" && \
-    chmod +x /usr/local/bin/docker-compose
+# # Install Docker-Compose
+# RUN curl -L -o /usr/local/bin/docker-compose \
+#     "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" && \
+#     chmod +x /usr/local/bin/docker-compose
 
-RUN cd /tmp && \
-    curl -sL -o git.tgz \
-    https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz && \
-    tar zxf git.tgz  && \
-    cd git-${GIT_VERSION}  && \
-    ./configure --prefix=/usr  && \
-    make && \
-    make install && \
-    rm -rf /tmp/*
+# RUN cd /tmp && \
+#     curl -sL -o git.tgz \
+#     https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz && \
+#     tar zxf git.tgz  && \
+#     cd git-${GIT_VERSION}  && \
+#     ./configure --prefix=/usr  && \
+#     make && \
+#     make install && \
+#     rm -rf /tmp/*
 
-RUN mkdir -p /home/runner ${AGENT_TOOLSDIRECTORY}
+# RUN mkdir -p /home/runner ${AGENT_TOOLSDIRECTORY}
 
 WORKDIR /home/runner
 
